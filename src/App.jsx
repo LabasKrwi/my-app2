@@ -29,6 +29,7 @@ function App () {
                 Создать пользователя
             </MyButton>
             <MyModal
+                
                 visible={modal}
                 setVisible={setModal}
             ><PostForm create={createPost}/></MyModal>

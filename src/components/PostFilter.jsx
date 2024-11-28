@@ -20,7 +20,6 @@ export const PostFilter = ({filter, setFilter}) => {
                         {value:'title', name:'По названию'},
                         {value:'body', name:'По описанию'}
                     ]}
-                    
                 />
             </div>
   )
