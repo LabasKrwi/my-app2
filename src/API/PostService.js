@@ -3,13 +3,13 @@ import axios from "axios";
 
 
 export default class PostService {
-    static async getAll(limit = 3, page = 2) {
-        const response = await axios.get('https://dummyjson.com/posts', {
+    static async getAll(limit = 3, page = 1) {
+        const response = await axios.get('https://jsonplaceholder.typicode.com/posts', {
             params: {
-                limit: limit,
-                page: page
+                _limit: limit,
+                _page: page
             }
         })
-            return response
+            return response;
     }
 }
