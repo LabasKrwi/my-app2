@@ -1,16 +1,18 @@
 import {React, useState, useEffect, useReducer, useRef} from 'react';
-import 'C:/Users/User/my-app2/src/styles/App.css';
-import PostList from "C:/Users/User/my-app2/src/components/PostList";
-import { PostForm } from "C:/Users/User/my-app2/src/components/PostForm";
-import { PostFilter } from "C:/Users/User/my-app2/src/components/PostFilter";
-import { MyModal } from "C:/Users/User/my-app2/src/components/UI/MyModal/MyModal";
-import MyButton from "C:/Users/User/my-app2/src/components/UI/buttons/MyButton";
-import {usePosts} from "C:/Users/User/my-app2/src/hooks/usePosts";
-import PostService from "C:/Users/User/my-app2/src/API/PostService";
-import Loader from "C:/Users/User/my-app2/src/components/UI/Loader/Loader";
-import { useFetching } from "C:/Users/User/my-app2/src/hooks/useFetching";
-import { getPageCount, getPagesArray } from "C:/Users/User/my-app2/src/utils/pages";
+import '../styles/App.css';
+import PostList from "../components/PostList";
+import { PostForm } from "../components/PostForm";
+import { PostFilter } from "../components/PostFilter";
+import { MyModal } from "../components/UI/MyModal/MyModal";
+import MyButton from "../components/UI/buttons/MyButton";
+import {usePosts} from "../hooks/usePosts";
+import PostService from "../API/PostService";
+import Loader from "../components/UI/Loader/Loader";
+import { useFetching } from "../hooks/useFetching";
+import { getPageCount, getPagesArray } from "../utils/pages";
 import Pagination from "../components/UI/pagination/Pagination";
+import { useObserver } from '../hooks/useObserver';
+import MySelect from '../components/UI/select/MySelect';
 
 function Posts () {
     const [posts, setPosts] = useState ([]);
@@ -21,8 +23,7 @@ function Posts () {
     const [limit, setLimit] = useState(10);
     const [page, setPage] = useState(1);
     const lastElement = useRef();
-    const observer = useRef();
-    console.log(lastElement);
+    
     
 
     const [fetchPosts, isPostsLoading, postError] = useFetching(async (limit, page) => {
@@ -32,11 +33,13 @@ function Posts () {
         setTotalPages(getPageCount(totalCount, limit)) 
     })
 
-    
+    useObserver(lastElement, page < totalPages, isPostsLoading, ()=> {
+        setPage(page + 1)
+    })
 
     useEffect(() => {
         fetchPosts(limit, page)
-    }, [page])
+    }, [page, limit])
 
     const createPost = (newPost) => {
         setPosts ([...posts, newPost])
@@ -67,13 +70,24 @@ function Posts () {
             filter ={filter} 
             setFilter={setFilter}
             />
+            <MySelect
+                value={limit}
+                onChange={value => setLimit(value)}
+                defaultValue="Кол-во элементов на странице"
+                options={[
+                    {value:5, name:'5'},
+                    {value:10, name:'10'},
+                    {value:25, name:'25'},
+                    {value:-1, name:'Показать все'},
+                ]}
+            ></MySelect>
             {postError && 
                 <h1>Произошла ошибка ${postError}</h1>
             }
             <PostList remove={removePost} posts={sortedAndSearchedPosts} title="Посты про JS"/>
             <div ref={lastElement} style={{ height: 20, background: 'red'}}/>
             {isPostsLoading &&
-                <div style={{display:'flex', justifyContent: 'center', marginTop:'50px'}}><Loader /></div>
+            <div style={{display:'flex', justifyContent: 'center', marginTop:'50px'}}><Loader /></div>
             }
             <Pagination 
             page={page} 
